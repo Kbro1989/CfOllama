@@ -1,0 +1,17 @@
+name = "ollama-cloudflare-worker"
+main = "src/index.ts"
+compatibility_date = "2026-06-18"
+compatibility_flags = ["nodejs_compat"]
+
+[durable_objects]
+bindings = [
+  { name = "OLLAMA_DO", class_name = "OllamaDurableObject" }
+]
+
+[[kv_namespaces]]
+binding = "MODEL_CONFIG"
+id = "317b95fb8ab149b3b68fdf5088a0c60a"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["OllamaDurableObject"]

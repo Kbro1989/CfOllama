@@ -1,0 +1,23 @@
+CfOllama repository setup
+==========================
+Remote configured: https://github.com/Kbro1989/CfOllama.git
+
+Step 1: Create missing local git identity for this repo
+git config --local user.name "Krist"
+git config --local user.email "krist@users.noreply.github.com"
+
+Step 2: Stage the project
+git add README.md LICENSE src/ wrangler.toml package.json tsconfig.json
+
+Step 3: Commit
+git commit -m "Initial CfOllama worker with DO, KV, websocket bridge, and sandboxing"
+
+Step 4: Push to GitHub
+git push -u origin main
+
+Notes:
+- If this remote is empty, the above will work directly.
+- If the remote already has commits, replace Step 4 with:
+  git push -u origin main --force-with-lease
+- .env is ignored; do not commit secrets.
+- After push, verify with: curl -i https://<your-worker>.workers.dev/health
