@@ -1,31 +1,29 @@
-# CfOllama
+# CfOllama — Ollama Cloudflare Proxy
 
-Run [Ollama](https://ollama.com/) behind [Cloudflare Workers](https://developers.cloudflare.com/workers/) and originate chat requests through a Durable Object / WebSocket bridge for methodology experiments with local inference.
+> Cloudflare Workers · TypeScript · Durable Objects · WebSocket · KV
 
-Current local Ollama binary:
-- path: `/mnt/c/Users/krist/ollama-cloudflare-worker/.env`
-- status: redacted in git history
+Cloudflare Worker proxying Ollama API requests and WebSocket connections through a singleton
+`OllamaDurableObject`. Enables multi-session Ollama access from the edge.
 
-## Status
+## Routing
 
-- Worker: `ollama-cloudflare-worker`
-- Key files: `src/index.ts`, `src/ollama-do.ts`, `wrangler.toml`, `tsconfig.json`
-- Last verified: TypeScript check passes; `wrangler dev` local runtime restart pending after WSL workerd review
+| Path/Condition | Destination |
+|---|---|
+| `Upgrade: websocket` | `OllamaDurableObject` (WS session) |
+| `/api/*` | `OllamaDurableObject` (REST) |
+| `/health` | Inline health check |
 
-## Quick start
+## OllamaDurableObject
 
-```bash
-npm install
-npx wrangler dev
+- `blockConcurrencyWhile` — session loading on startup
+- Request body size guard: 2MB max
+- Content-type enforcement: 415 on non-JSON POST
+- `MODEL_CONFIG` KV — per-model configuration store
+
+## Architecture
+
 ```
-
-Requires Wrangler and Cloudflare account credentials configured.
-
-## Push notes
-
-- Remote: `https://github.com/Kbro1989/CfOllama.git`
-- Use `git push -u origin main --force-with-lease` if the remote already has commits from the `Start coding with Codespaces` scaffold, otherwise `git push -u origin main` works after the first commit.
-
-## License
-
-MIT — educational/experimental use only.
+src/
+├── index.ts       # Worker entry + routing + WS upgrade
+└── ollama-do.ts   # OllamaDurableObject + session map
+```
